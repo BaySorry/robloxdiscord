@@ -2,10 +2,27 @@ import discord
 from discord.ext import commands
 import requests
 import config
+from flask import Flask, request, jsonify
+import threading
 
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix='/', intents=intents)
+
+app = Flask(__name__)
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    data = request.json
+    action = data.get('action')
+    if action == 'connect':
+        # Örnek işlem: Bağlantı başarılı
+        return jsonify({"message": "Connected!"}), 200
+    else:
+        return jsonify({"message": "Failed to Connect"}), 400
+
+def run_app():
+    app.run(host='0.0.0.0', port=5000)
 
 @bot.event
 async def on_ready():
@@ -14,7 +31,7 @@ async def on_ready():
 @bot.command()
 async def connect(ctx):
     try:
-        response = requests.get('https://api.roblox.com/some_endpoint', headers={'Authorization': f'Bearer {config.ROBLOX_API_KEY}'})
+        response = requests.post('http://localhost:5000/webhook', json={"action": "connect"})
         if response.status_code == 200:
             await ctx.send('Connected!')
         else:
@@ -31,7 +48,7 @@ async def kanal(ctx):
 @bot.command()
 async def grup(ctx, action: str, group_id: int = None):
     if action == 'list':
-        groups = ['Group1', 'Group2']  # Bu kısmı dinamik yapmanız gerekecek.
+        groups = ['Group1', 'Group2']
         await ctx.send(f'Available groups: {", ".join(groups)}')
     elif action == 'enter':
         if group_id:
@@ -51,4 +68,6 @@ async def photo(ctx, photo_id: str):
     embed.set_image(url=photo_url)
     await ctx.send(embed=embed)
 
-bot.run(config.DISCORD_TOKEN)
+if __name__ == '__main__':
+    threading.Thread(target=run_app).start()
+    bot.run(config.DISCORD_TOKEN)
