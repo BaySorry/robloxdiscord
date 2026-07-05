@@ -1,45 +1,30 @@
--- Storage Hunters Key Bypass (PRIOR x NARAKAHUB / PandaAuth)
+  local origInt = getgenv().internal_request
+  local origReq = getgenv().request
+  local origHttp = getgenv().http_request
 
-local genv = getgenv()
+  getgenv().internal_request = function(options)
+      if type(options) == "table" and options.Url and options.Url:find("pandauth") then
+          return {Success=true, StatusCode=200, Body=[[{"success":true,"key":"bypass-prior-key-001","expires":"2027-12-3
+  1","data":{"hwid":"test","service":"prior","rank":"premium"}}]]}
+      end
+      return origInt and origInt(options)
+  end
 
--- HOOK
-local old_req = genv.request
-genv.request = function(options)
-    if type(options) == "table" and options.Url and options.Url:find("pandauth") then
-        return {
-            Success = true,
-            StatusCode = 200,
-            StatusMessage = "OK",
-            Body = '{"success":true,"key":"bypass-key-123","expires":"2027-12-31","data":{"hwid":"test","service":"ruthlesshub","rank":"premium"}}'
-        }
-    end
-    return old_req and old_req(options)
-end
+  getgenv().request = function(options)
+      if type(options) == "table" and options.Url and options.Url:find("pandauth") then
+          return {Success=true, StatusCode=200, Body=[[{"success":true,"key":"bypass-prior-key-001","expires":"2027-12-3
+  1","data":{"hwid":"test","service":"prior","rank":"premium"}}]]}
+      end
+      return origReq and origReq(options)
+  end
 
-local old_http = genv.http_request
-genv.http_request = function(options)
-    if type(options) == "table" and options.Url and options.Url:find("pandauth") then
-        return {
-            Success = true,
-            StatusCode = 200,
-            Body = '{"success":true,"key":"bypass-key-123","expires":"2027-12-31","data":{"hwid":"test","service":"ruthlesshub","rank":"premium"}}'
-        }
-    end
-    return old_http and old_http(options)
-end
+  getgenv().http_request = function(options)
+      if type(options) == "table" and options.Url and options.Url:find("pandauth") then
+          return {Success=true, StatusCode=200, Body=[[{"success":true,"key":"bypass-prior-key-001","expires":"2027-12-3
+  1","data":{"hwid":"test","service":"prior","rank":"premium"}}]]}
+      end
+      return origHttp and origHttp(options)
+  end
 
-local old_int = genv.internal_request
-genv.internal_request = function(options)
-    if type(options) == "table" and options.Url and options.Url:find("pandauth") then
-        return {
-            Success = true,
-            StatusCode = 200,
-            Body = '{"success":true,"key":"bypass-key-123","expires":"2027-12-31","data":{"hwid":"test","service":"ruthlesshub","rank":"premium"}}'
-        }
-    end
-    return old_int and old_int(options)
-end
-
---Execute Script
-print("Hook installed. Loading StorageHunter...")
-loadstring(game:HttpGet("https://raw.githubusercontent.com/NarakaHUB/StorageHunter/refs/heads/main/README.md"))()
+  print("[Bypass] Prior bypass ACTIVE...")
+  loadstring(game:HttpGet("https://raw.githubusercontent.com/NarakaHUB/StorageHunter/refs/heads/main/README.md"))()
